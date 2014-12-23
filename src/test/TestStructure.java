@@ -13,6 +13,7 @@ public class TestStructure {
 //		copyConstructor();
 //		Integer.decode(nm)
 		System.out.println(Integer.decode("0xC"));
+		generalTest();
 	}
 	
 	public static void copyConstructor(){
