@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="/home/zhenxu/Library/YicesLite.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="libs/commons-lang3-3.3.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ConcolicExecutionEngine"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UIModelGenerator"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

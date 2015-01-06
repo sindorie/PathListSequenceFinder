@@ -20,6 +20,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import main.Paths;
+
 public class Utility {
 
 	public static <T> T[] combineArrays(T[]... arrays){
@@ -48,7 +50,7 @@ public class Utility {
 		return result;
 	}
 	
-	public static String path = "generated/";
+	public static String path = Paths.appDataDir;
 	
 	public static boolean deleteObject(String name){
 		File f = new File(path+name);
@@ -60,11 +62,12 @@ public class Utility {
 	
 	public static boolean writeObject(String name, Object o){
 		try {
-			File f = new File("generated");
+			File f = new File(Paths.appDataDir);
 			if(!f.exists()){
 				boolean created = f.mkdir();
 				if(created == false) System.out.println("folder creation fails");
 			}
+			System.out.println("writing to "+path+name);
 			FileOutputStream fileOut = new FileOutputStream(path+name);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(o);
@@ -92,6 +95,7 @@ public class Utility {
 			fileIn.close();
 			return result;
 		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
 			System.out.println("Reading objects from disk fails"); 
 		}
         return null;

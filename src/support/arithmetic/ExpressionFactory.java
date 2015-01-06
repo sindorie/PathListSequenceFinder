@@ -1,7 +1,10 @@
 package support.arithmetic;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import support.Utility;
@@ -13,6 +16,46 @@ import support.Utility;
  *
  */
 public class ExpressionFactory  {
+	
+	static Map<String,String> operationMap = new HashMap<String,String>();
+	static Map<String,String> typeMap = new HashMap<String,String>();
+	static{
+		String[] list = {
+			"add", "+",
+			"sub", "-",
+			"mul", "*",
+			"dev", "/",
+			"and", "and",
+			"or", "or",
+			"xor", "xor",
+			"neg", "neg",  //this should be replace by xor X true
+			
+			"<","<",
+			">",">",
+			"=","=",
+			"!=","/=",
+			"<=","<=",
+			">=",">=",
+		};
+		
+		for(int i=0;i<list.length;i+=2){
+			operationMap.put(list[i], list[i+1]);
+		}
+		//ignore shl shr ushr
+		
+		
+		String[] typeList = {
+			"I", "int",
+			"F", "real",
+			"D", "real",
+			"b", "bool"
+		};
+		for(int i=0;i<typeList.length;i+=2){
+			typeMap.put(typeList[i], typeList[i+1]);
+		}
+	}
+	
+	
 	public static boolean DEBUG = false;
 	static List<String> equality = new ArrayList<String>();
 	static{
@@ -22,6 +65,33 @@ public class ExpressionFactory  {
 		for(String s:tmp){
 			equality.add(s);
 		}
+	}
+	
+	private static int furtherProcess(Expression expre){
+		Enumeration<Expression> enumater = expre.depthFirstEnumeration();
+		int hasUnknownOperater = 0;
+		while(enumater.hasMoreElements()){
+			Expression current = enumater.nextElement();
+			if(current.isLeaf() == false){
+				String content = current.getContent();
+				String equvialent = operationMap.get(content);
+				if(equvialent == null){
+					hasUnknownOperater += 1;
+					System.out.println("hasUnknownOperater:"+content);
+				}else if(equvialent.equals("neg")){
+					int count = current.getChildCount();
+					if(count != 1) {
+						System.out.println("neg child count:"+count);
+						throw new AssertionError(); //how could neg has more than one children?
+					}
+					//turn (neg x) -> (xor x true)
+					Constant trueCon = new Constant("true");
+					current.setUserObject("xor");
+					current.add(trueCon);
+				}else current.setUserObject(equvialent);
+			}
+		}
+		return hasUnknownOperater;
 	}
 	
 	public static Expression buildFromWenHao(String prefixString) { 
@@ -122,16 +192,23 @@ public class ExpressionFactory  {
 			return new Formula(operator, (Expression)result.getChildAt(0), (Expression)result.getChildAt(1));
 		}
 		
+		
+		int errorCount = furtherProcess(result);
+		if(errorCount >0) return null;
+		
 		return result;		
 	} 
 	
 	public static Expression buildVariableFromWenhao(String input){
 		String[] parts = input.split(":");
 		if(parts.length == 2){
-			return new Variable(parts[0], parts[1]); 
+			String type = typeMap.get(parts[0]);
+			if(type != null) return new Variable(parts[0], parts[1]); 
 		}else if(input.startsWith("#")){
-			long val = Long.decode(input.replace("#", ""));
-			return new Constant(val+"");
+			try{
+				long val = Long.decode(input.replace("#", ""));
+				return new Constant(val+"");
+			}catch(NumberFormatException nfe){}
 		}
 		return new Constant(input);
 	}
