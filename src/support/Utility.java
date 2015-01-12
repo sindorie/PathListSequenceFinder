@@ -10,6 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -20,6 +22,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import concolic.Expression;
+import concolic.PathSummary;
 import main.Paths;
 
 public class Utility {
@@ -136,5 +140,28 @@ public class Utility {
         frame.pack();
         frame.setVisible(true);
 	}
-	
+ 
+	public static String formatMethodName(String input){
+		//asd(qwe/qwe/qwe)
+		String parts1[] = input.split(";->");
+		if(parts1.length <= 1) return input;
+		
+		//function name and parameter
+		String para = "";
+		String functionName = parts1[1].split("\\(")[0];
+		Pattern paramter = Pattern.compile("\\(([^\\)]*)\\)");//find (asd/asd/asd)
+		Matcher matcher = paramter.matcher(parts1[1]);
+		boolean found = matcher.find();
+		if(found){
+			String raw = matcher.group(1).replaceAll("\\(|\\)|;", "");
+			String parParts[] = raw.split("\\/");
+			para = parParts[parParts.length-1];
+		}else{
+			
+		}
+		
+		String parts2[] = parts1[0].split("\\/");
+		if(parts2.length <=1) return parts2[0] +" "+ functionName+"("+para+")";
+		else return parts2[parts2.length-1] +" "+ functionName+"("+para+")";
+	}
 }

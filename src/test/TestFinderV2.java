@@ -19,7 +19,7 @@ import support.Utility;
 import support.arithmetic.*;
 import support.solver.YicesProcessInterface;
 import version2.NodeContent;
-import version2.ParsedSummary;
+import version2.WrappedSummary;
 import version2.PathListSequenceFinder; 
 
 public class TestFinderV2 {
@@ -38,7 +38,7 @@ public class TestFinderV2 {
 //	}
 	
 	public static void basicTest() throws IOException{
-		List<ParsedSummary> list = null;
+		List<WrappedSummary> list = null;
 		
 		switch(basicTestCase){
 		case 0:list = TestSummary.basicSummary1(); break;
@@ -46,13 +46,13 @@ public class TestFinderV2 {
 		case 2:list = TestSummary.basicSummary3(); break;
 		}
 		
-		for(ParsedSummary sum : list){
+		for(WrappedSummary sum : list){
 			System.out.println(sum.toStringDetail());
 		}
 		
 		YicesProcessInterface solver = new YicesProcessInterface(path);
 		PathListSequenceFinder plf = new PathListSequenceFinder(solver);
-		Set<ParsedSummary> set = new HashSet<ParsedSummary>();
+		Set<WrappedSummary> set = new HashSet<WrappedSummary>();
 		set.addAll(list);
 		DefaultMutableTreeNode node = plf.findSummaryPath(set, list.get(0));
 		
@@ -67,7 +67,7 @@ public class TestFinderV2 {
 		Object o = Utility.readObject(name);
 		DefaultMutableTreeNode node;
 		if(o == null){
-			List<ParsedSummary> list = TestSummary.basicSummary1();
+			List<WrappedSummary> list = TestSummary.basicSummary1();
 			switch(basicTestCase){
 				case 0:list = TestSummary.basicSummary1(); break;
 				case 1:list = TestSummary.basicSummary2(); break;
@@ -76,7 +76,7 @@ public class TestFinderV2 {
 			
 			YicesProcessInterface solver = new YicesProcessInterface(path);
 			PathListSequenceFinder plf = new PathListSequenceFinder(solver);
-			Set<ParsedSummary> set = new HashSet<ParsedSummary>();
+			Set<WrappedSummary> set = new HashSet<WrappedSummary>();
 			set.addAll(list);
 			node = plf.findSummaryPath(set, list.get(0));
 			Utility.writeObject(name, node);

@@ -1,10 +1,9 @@
 package version2;
 
-import java.io.Serializable;
-import java.util.List;
+import java.io.Serializable; 
 import java.util.Set;
 
-import support.arithmetic.Formula;
+import concolic.Expression; 
 /**
  * A simple wrapper which encapsulates necessary data for the ConstraintTree
  * 
@@ -12,12 +11,12 @@ import support.arithmetic.Formula;
  *
  */
 public class NodeContent implements Serializable{
-	public ParsedSummary summary;
-	public Set<Formula> cumulativeConstraint;
-	NodeContent(ParsedSummary content){
+	public WrappedSummary summary;
+	public Set<Expression> cumulativeConstraint;
+	NodeContent(WrappedSummary content){
 		this.summary = content ;
 	}
-	NodeContent(ParsedSummary content, Set<Formula> constraint){
+	NodeContent(WrappedSummary content, Set<Expression> constraint){
 		this.summary = content ;
 		this.cumulativeConstraint = constraint;
 	}
