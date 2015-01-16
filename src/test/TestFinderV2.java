@@ -15,11 +15,11 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import Component.NodeContent;
+import Component.WrappedSummary;
 import support.Utility;
 import support.arithmetic.*;
 import support.solver.YicesProcessInterface;
-import version2.NodeContent;
-import version2.WrappedSummary;
 import version2.PathListSequenceFinder; 
 
 public class TestFinderV2 {
@@ -54,7 +54,7 @@ public class TestFinderV2 {
 		PathListSequenceFinder plf = new PathListSequenceFinder(solver);
 		Set<WrappedSummary> set = new HashSet<WrappedSummary>();
 		set.addAll(list);
-		DefaultMutableTreeNode node = plf.findSummaryPath(set, list.get(0));
+		DefaultMutableTreeNode node = plf.findSequence(set, list.get(0));
 		
 		showInformaion(node);
 	}
@@ -78,7 +78,7 @@ public class TestFinderV2 {
 			PathListSequenceFinder plf = new PathListSequenceFinder(solver);
 			Set<WrappedSummary> set = new HashSet<WrappedSummary>();
 			set.addAll(list);
-			node = plf.findSummaryPath(set, list.get(0));
+			node = plf.findSequence(set, list.get(0));
 			Utility.writeObject(name, node);
 		}else{
 			node = (DefaultMutableTreeNode)o;

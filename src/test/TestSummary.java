@@ -3,12 +3,12 @@ package test;
 import java.util.ArrayList;
 import java.util.List;
 
+import Component.WrappedSummary;
 import support.Utility;
 import support.arithmetic.Assignment;
 import support.arithmetic.ExpressionFactory;
 import support.arithmetic.Formula;
 import support.arithmetic.Variable;
-import version2.WrappedSummary;
 
 public class TestSummary {
 

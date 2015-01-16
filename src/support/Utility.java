@@ -21,13 +21,24 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-
-import concolic.Expression;
+ 
 import concolic.PathSummary;
 import main.Paths;
 
 public class Utility {
-
+	
+	public static <T> ArrayList<T> castToArrayList(List<T> input){
+		if(input.getClass().equals(ArrayList.class)){
+			return (ArrayList<T>) input;
+		}else{
+			ArrayList<T> result = new ArrayList<T>();
+			for(T element : input){
+				result.add(element);
+			}
+			return result;
+		}
+	}
+	
 	public static <T> T[] combineArrays(T[]... arrays){
 		int totalLeng = 0;
 		for(T[] arr : arrays){

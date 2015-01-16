@@ -1,5 +1,7 @@
 package support.GUI;
 
+import java.util.Map.Entry;
+
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -7,8 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 
-import version2.WrappedSummary;
-import concolic.Expression;
+import analysis.Expression;
+import Component.WrappedSummary; 
 
 public class SummaryDetailPanel extends JPanel {
 
@@ -75,8 +77,9 @@ public class SummaryDetailPanel extends JPanel {
 		this.constraintList.setModel(constraintModel);
 		
 		DefaultListModel<Expression> symbolicModel = new DefaultListModel<Expression>();
-		for(Expression symbolic : summary.symbolic){
-			constraintModel.addElement(symbolic);
+		for(Entry<Expression, Expression> entry : summary.symbolic.entrySet()){
+			constraintModel.addElement(entry.getKey());
+			constraintModel.addElement(entry.getValue());
 		}
 		this.symbolicList.setModel(symbolicModel);
 		

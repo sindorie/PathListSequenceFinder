@@ -27,10 +27,10 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import version2.WrappedSummary;
-import concolic.Expression;
-import concolic.PathSummary;
-import concolic.Variable;
+import analysis.Expression;
+import analysis.Variable;
+import Component.WrappedSummary; 
+import concolic.PathSummary; 
 
 public class PathSummaryUIFactory {
 //	private final static JLabel EMPTYLABEL = new JLabel("Empty");

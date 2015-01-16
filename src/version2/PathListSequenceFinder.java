@@ -15,9 +15,11 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode; 
 
-import concolic.Expression;
+import analysis.Expression;
+import analysis.Variable;
+import Component.NodeContent;
+import Component.WrappedSummary;
 import concolic.PathSummary;
-import concolic.Variable;
 import support.GUI.SummarySelectionWindow;
 import support.GUI.UIUtility;
 import support.solver.YicesProcessInterface; 

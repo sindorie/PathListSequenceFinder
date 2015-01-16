@@ -1,9 +1,10 @@
-package version2;
+package Component;
 
 import java.io.Serializable; 
 import java.util.Set;
 
-import concolic.Expression; 
+import analysis.Expression;
+ 
 /**
  * A simple wrapper which encapsulates necessary data for the ConstraintTree
  * 
@@ -16,7 +17,7 @@ public class NodeContent implements Serializable{
 	NodeContent(WrappedSummary content){
 		this.summary = content ;
 	}
-	NodeContent(WrappedSummary content, Set<Expression> constraint){
+	public NodeContent(WrappedSummary content, Set<Expression> constraint){
 		this.summary = content ;
 		this.cumulativeConstraint = constraint;
 	}

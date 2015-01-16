@@ -11,9 +11,10 @@ import javax.swing.JList;
 import javax.swing.JCheckBox;
 
 import support.Utility;
-import version2.WrappedSummary;
 
 import javax.swing.JButton;
+
+import Component.WrappedSummary;
 
 public class SummaryListPanel extends JPanel {
 

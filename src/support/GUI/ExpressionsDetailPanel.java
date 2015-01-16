@@ -6,11 +6,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-
-import concolic.Expression;
-import concolic.Variable;
-
 import javax.swing.BoxLayout;
+
+import analysis.Expression;
+import analysis.Variable;
 
 public class ExpressionsDetailPanel extends JPanel {
 
