@@ -17,6 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.KShortestPaths;
+
 import main.Paths;
 import analysis.Expression;
 import analysis.Variable;
@@ -24,6 +25,7 @@ import Component.ExpressionUtility;
 import Component.NodeContent;
 import Component.WrappedSummary;
 import concolic.PathSummary;
+import staticFamily.StaticApp;
 import support.PathSummaryUIFactory;
 import support.Utility;
 import support.GUI.SummarySelectionWindow;
@@ -69,6 +71,50 @@ public class SequenceFinder {
 		return this.target;
 	}
 	
+	public void operate(StaticApp app, String stroageName, boolean force,
+			UIModelGenerator builder, List<PathSummary> rawList,
+			String targetMethodSig){	
+		
+		this.builder = builder;
+		this.rawList = rawList;
+
+		PathSummary local_target = null;
+		
+		for(PathSummary sum : rawList){
+			ArrayList<String> logs = sum.getExecutionLog();
+			if(logs.contains(targetMethodSig)){
+				System.out.println(logs);
+				local_target = sum;
+				break;
+			}
+		}
+		if(local_target == null){
+			System.out.println("cannot identify target in pathsummary by "+targetMethodSig);
+			return;
+		}
+		
+		filterAndSelect(rawList);
+		target = new WrappedSummary(local_target);
+		
+		int count = 0;
+		for(int i=0;i<wrappedSummaryListModel.getSize();i++){
+			WrappedSummary element = wrappedSummaryListModel.get(i);
+			String sig = element.methodSignature;
+			if(sig.contains("onCreate")){
+				element.isEntry = true;
+				count += 1;
+			}
+		}
+		if(count == 0){
+			System.out.println("no entry identified");
+			return;
+		}
+		
+		procedure(stroageName);
+	}
+	
+	
+	
 	public void loadOrOperate(String storageName, boolean force, UIModelGenerator builder, List<PathSummary> rawList){
 		storageName = storageName+"_Sequence";
 		this.rawList = rawList;
@@ -78,7 +124,9 @@ public class SequenceFinder {
 		if(toRead.exists() == false || force){
 			operate(storageName);
 		}else{
+			System.out.println("here1");
 			loadData(storageName);
+			System.out.println("here2");
 			if(task != null) task.onSequenceReady(this);
 		}
 	}
@@ -210,20 +258,24 @@ public class SequenceFinder {
 			for(Event event : uniqueList){ 
 				List<String> hits = event.getMethodHits();
 				
-				String qualified = null;
-				for(String hit : hits){
-					if(hit.startsWith("Landroid/support") || hit.contains("<init>")) continue;
-					qualified = hit; break;
-				}
-				if(qualified == null) continue;
-				
-				System.out.println(event);
-				System.out.println("qualified:"+qualified);
-				System.out.println(summary.methodSignature);
-				System.out.println(qualified.equals((summary.methodSignature)));
-				if(qualified.equals(summary.methodSignature)){
+				if(hits.contains(summary.methodSignature)){
 					mappingResult.add(event);
 				}
+				
+//				String qualified = null;
+//				for(String hit : hits){
+//					if(hit.startsWith("Landroid/support") || hit.contains("<init>")) continue;
+//					qualified = hit; break;
+//				}
+//				if(qualified == null) continue;
+//				
+//				System.out.println(event);
+//				System.out.println("qualified:"+qualified);
+//				System.out.println(summary.methodSignature);
+//				System.out.println(qualified.equals((summary.methodSignature)));
+//				if(qualified.equals(summary.methodSignature)){
+//					mappingResult.add(event);
+//				}
 			}
 			if(!mappingResult.isEmpty())
 				methodEventMap.put(summary.methodSignature, mappingResult.toArray(new Event[0]));
@@ -262,7 +314,7 @@ public class SequenceFinder {
 				currentEvent = next;
 			}
 			
-			List<Event[]> constructed = recursiveConnectList(intermediaPathBuffer, toInflate, 1);
+			List<Event[]> constructed = recursiveConnectList(intermediaPathBuffer, toInflate, 0);
 			result.addAll(constructed);
 		}
 		return result;
@@ -296,10 +348,14 @@ public class SequenceFinder {
 			List<Event[]> local_list = new ArrayList<Event[]>();
 			Event current = toInflate[index];
 			List<GraphPath<UIState, Event>> paths = intermediaPathBuffer.get(index+1);
-			for(GraphPath<UIState, Event> path: paths){
-				List<Event> events = path.getEdgeList();
-				events.add(0, current);
-				local_list.add(events.toArray(new Event[0]));
+			if(paths == null){
+				local_list.add(new Event[]{current});
+			}else{
+				for(GraphPath<UIState, Event> path: paths){
+					List<Event> events = path.getEdgeList();
+					events.add(0, current);
+					local_list.add(events.toArray(new Event[0]));
+				}
 			}
 			List<Event[]> toConcats = recursiveConnectList(intermediaPathBuffer, toInflate, index+1);
 			
@@ -321,13 +377,26 @@ public class SequenceFinder {
 	 * @return
 	 */
 	private List<Event[]> findRawEventSequence(List<NodeContent[]> contentPath){
+		for(NodeContent[] contents : contentPath){
+			System.out.println("contentPath:"+Arrays.toString(contents));
+		}
+		
+		
 		List<Event[]> result = new ArrayList<Event[]>();
 		int index = 0;
 		for(NodeContent[] contentList : contentPath){
 			List<Event[]> sequence = unitProcess(contentList);
+			for(Event[] columns : sequence){
+				System.out.println("columns: "+Arrays.toString(columns));
+			}
+			
 			//will not return null and empty sequence is needed
 //			if(sequence == null || sequence.size() == 0) continue;
 			List<Event[]> local_result = recursiveConstruct(sequence);
+			for(Event[] local : local_result){
+				System.out.println("local_result:"+Arrays.toString(local));
+			}
+			
 			result.addAll(local_result);
 			index+=1;
 		}
@@ -338,10 +407,19 @@ public class SequenceFinder {
 	private List<Event[]> recursiveConstruct(List<Event[]> input){
 		switch(input.size()){
 		case 0: return new ArrayList<Event[]>();
-		case 1:{ return input;}
+		case 1:{ 
+			Event[] colEvent = input.get(0);
+			List<Event[]> result = new ArrayList<Event[]>();
+			for(Event singleEvent : colEvent){
+				result.add(new Event[]{singleEvent});
+			}
+			return result;
+		}
 		default:{
 			Event[] currentColumn = input.get(0);
+			System.out.println("recursiveConstruct: "+Arrays.toString(currentColumn));
 			List<Event[]> sequences = recursiveConstruct(input.subList(1, input.size()));
+
 			List<Event[]> result = new ArrayList<Event[]>();
 			for(Event cell : currentColumn){
 				for(Event[] sequence : sequences){
@@ -362,12 +440,11 @@ public class SequenceFinder {
 		//first step map to event. 
 		List<Event[]> rawEventSequence = new ArrayList<Event[]>();
 		for(NodeContent node:contentList){
-			List<Event> block = new ArrayList<Event>();
 			List<Event> summaryEventSequence = node.summary.summaryReference.getEventSequence();
 			if(summaryEventSequence != null && summaryEventSequence.size() > 0){
 				//concolic generated
 				Event trigger = summaryEventSequence.get(summaryEventSequence.size()-1);
-				rawEventSequence.add(block.toArray(new Event[]{trigger}));
+				rawEventSequence.add(new Event[]{trigger});
 			}else{ 
 				//Symbolic generated
 				Event[] triggers = methodEventMap.get(node.summary.methodSignature);
@@ -426,13 +503,25 @@ public class SequenceFinder {
 		if(DEBUG){
 			System.out.println(content.summary.toStringDetail());
 		}
-		
+				
 		if(content.summary.isEntry){
 			if(DEBUG) System.out.println("Target is entry");
 			return null;
 		}
+		
 		List<DefaultMutableTreeNode> result = new ArrayList<DefaultMutableTreeNode>();
-//		Set<Variable> conVars = Expression.getUnqiueVarSet(content.cumulativeConstraint, variablePattern);
+		Set<Variable> vars = Expression.getUnqiueVarSet(content.cumulativeConstraint);
+		if(vars.size() == 0){
+			for(WrappedSummary sum : summarySet){
+				if(sum.isEntry){
+					NodeContent newContent = new NodeContent(sum,content.cumulativeConstraint);
+					DefaultMutableTreeNode child = new DefaultMutableTreeNode(newContent);
+					leaf.add(child);
+					result.add(child);
+				}
+			};
+			return result;
+		}
 		
 		for(WrappedSummary summary : summarySet){ 
 			//TODO check valid symbolic state
@@ -443,7 +532,6 @@ public class SequenceFinder {
 				System.out.println("----Current Summary----");
 				System.out.println(summary.toStringDetail());
 			}
-			
 			
 			//Relativity checking
 			Set<Expression> copiedConstraint = new HashSet<Expression>();
@@ -472,6 +560,7 @@ public class SequenceFinder {
 			for(Expression single : summary.conditions){
 				copiedConstraint.add(single);
 			}
+			
 			
 //			copiedConstraint.addAll(summary.conditions);
 			for(Expression f :copiedConstraint){
@@ -519,6 +608,12 @@ public class SequenceFinder {
 				if(DEBUG){
 					System.out.println("Remaining unsolved vars: "+unsolved);
 				}
+				
+				Set<Variable> whiteList = Expression.getUnqiueVarSet(summary.conditions);
+				for(Variable var : whiteList){
+					unsolved.remove(var);
+				}
+				
 				if(unsolved.size() > MAX_UNSOLVED){
 					if(DEBUG){
 						System.out.println("Cancel appending entry summary: "+unsolved.size()+"> max:"+MAX_UNSOLVED);

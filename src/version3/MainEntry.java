@@ -117,7 +117,7 @@ public class MainEntry {
 		List<PathSummary> summaries = ee.buildPathSummaries(force, builder);
 		YicesProcessInterface yices;
 		try {
-			yices = new YicesProcessInterface(Paths.yicesLocation);
+			yices = new YicesProcessInterface(YicesProcessInterface.yicesLocation);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Yices initialization fails");

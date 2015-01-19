@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class YicesProcessInterface implements ProblemSolver {
+	
+	public static String yicesLocation = "/home/zhenxu/Tools/Solver/yices-2.2.2/bin/yices";
 	private Process yicesProcess;
 	private InputStream readChannel, errorChannel;
 	private OutputStream writeChannel;

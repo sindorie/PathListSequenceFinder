@@ -1,6 +1,7 @@
 package support.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -12,6 +13,7 @@ import java.awt.event.FocusListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel; 
 import javax.swing.event.ListSelectionEvent;
@@ -45,7 +47,7 @@ public class SummarySelectionWindow {
 		layer2 = new JSplitPane();
 		layer1.setRightComponent(layer2);
 		layer1.setResizeWeight(0);
-		layer2.setResizeWeight(0);
+		layer2.setResizeWeight(0.5);
 		layer1.setDividerLocation(200);
 		layer1.setDividerSize(3);
 		layer2.setDividerSize(3);
@@ -97,28 +99,7 @@ public class SummarySelectionWindow {
 		selectionPanel.activiateButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				if(activited) return;
-//				if(target == null){
-//					selectionPanel.informationLabel.setText("Empty Target");
-//				}
-//				
-//				boolean foundEntry = false;
-//				
-//				ListModel<WrappedSummary> listmodel = selectionPanel.summaryList.getModel();
-//				for(int i = 0; i<selectionPanel.summaryList.getModel().getSize();i++){
-//					WrappedSummary child = listmodel.getElementAt(i);
-//					if(child.isEntry){
-//						foundEntry = true;
-//						break;
-//					}
-//				}
-//						
-//				if(foundEntry == false){
-//					selectionPanel.informationLabel.setText("Empty entry");
-//				}
-				
 				activate();
-//				activited = true;
 			}
 		});
 	}
@@ -138,43 +119,6 @@ public class SummarySelectionWindow {
 		}else{
 			selectionPanel.informationLabel.setText("No operation specified");
 		}
-		
-//		Thread find = new Thread(new Runnable(){
-//			@Override
-//			public void run() {
-//				selectionPanel.informationLabel.setText("activated");
-//				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//				YicesProcessInterface solver = null;
-//				try {
-//					solver = new YicesProcessInterface(Paths.yicesBinLocation);
-//				} catch (IOException e) {
-//					selectionPanel.informationLabel.setText("Yices process starting error");
-//					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//					return;
-//				}
-//				PathListSequenceFinder sequenceFinder = new PathListSequenceFinder(solver);
-//				DefaultListModel<WrappedSummary> reference = (DefaultListModel<WrappedSummary>) selectionPanel.summaryList.getModel();
-//				ArrayList<WrappedSummary> list = new ArrayList<WrappedSummary>();
-//				for(int i =0 ;i < reference.getSize();i++){
-//					list.add(reference.getElementAt(i));
-//				}
-//				DefaultMutableTreeNode tree = sequenceFinder.findSummaryPath(list, target);
-//				UIUtility.showComponent("result", new JTree(tree), JFrame.EXIT_ON_CLOSE);
-//				
-//				DefaultMutableTreeNode node = tree.getFirstLeaf();
-//				List<NodeContent[]> contentPath = new ArrayList<NodeContent[]>(); 
-//				while(node != null){
-//					NodeContent content = (NodeContent)node.getUserObject();
-//					if(content.summary.isEntry){
-//						NodeContent[] path = (NodeContent[])node.getUserObjectPath();
-//						contentPath.add(path);
-//					}
-//				}
-//			}
-//			
-//		});
-//		
-//		find.start();
 	}
 	
 	private void setupMiddlePanelListener(SummaryDetailPanel toDisplay){
@@ -271,15 +215,19 @@ public class SummarySelectionWindow {
 //		con.add(component);
 //	}
 	private void addToSplitPanelHelper(int position, JComponent component){
+		JScrollPane jsp = new JScrollPane();
 		switch(position){
 		case LEFT:{
-			layer1.setLeftComponent(component);
+			jsp.setViewportView(component);
+			layer1.setLeftComponent(jsp);
 		}break;
 		case MIDDLE:{
-			layer2.setLeftComponent(component);
+			jsp.setViewportView(component);
+			layer2.setLeftComponent(jsp);
 		}break;
 		case RIGHT:{
-			layer2.setRightComponent(component);
+			jsp.setViewportView(component);
+			layer2.setRightComponent(jsp);
 		}break;
 		}
 	}

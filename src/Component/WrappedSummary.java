@@ -53,7 +53,7 @@ public class WrappedSummary implements Serializable{
 		}
 		sb.append(" ExecutionLog: ");
 		sb.append(executionLog+"\n");
-		
+
 		return sb.toString();
 	}
 }

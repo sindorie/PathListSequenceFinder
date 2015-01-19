@@ -78,10 +78,12 @@ public class PathSummaryUIFactory {
 			addLeftComponent();
 			updateRightPanel(-1,false);
 			
-			parent.setLeftComponent(left);
+			JScrollPane jsp = new JScrollPane();
+			jsp.setViewportView(left);
+			parent.setLeftComponent(jsp);
 			
 			parent.setDividerSize(3);  
-			parent.setResizeWeight(0); 
+			parent.setResizeWeight(0.5); 
 			parent.setPreferredSize(new Dimension(600, 400)); 
 			
 			return parent;
@@ -243,8 +245,9 @@ public class PathSummaryUIFactory {
 //				right.setPreferredSize(new Dimension(parent.getWidth()-width, parent.getHeight()));
 //			}
 			
-			
-			this.parent.setRightComponent(right);	
+			JScrollPane jsp = new JScrollPane();
+			jsp.setViewportView(right);
+			this.parent.setRightComponent(jsp);	
 		}
 		
 		private static String getProperName(String input){

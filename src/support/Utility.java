@@ -82,7 +82,17 @@ public class Utility {
 				boolean created = f.mkdir();
 				if(created == false) System.out.println("folder creation fails");
 			}
-			System.out.println("writing to "+path+name);
+			System.out.println("writing to "+path+name); 
+			
+			//create necessary directory
+			String[] parts = (path+name).split("\\/");
+			String dir = "";
+			for(int i=0;i<parts.length-1;i++){
+				dir += parts[i] + "/";
+			}
+			File toCheck = new File(dir);
+			if(toCheck.exists() == false){toCheck.mkdirs();}
+		
 			FileOutputStream fileOut = new FileOutputStream(path+name);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(o);
@@ -109,9 +119,9 @@ public class Utility {
 			in.close();
 			fileIn.close();
 			return result;
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-			System.out.println("Reading objects from disk fails"); 
+		} catch (Exception e) {
+//			System.out.println(e.getMessage());
+//			System.out.println("Reading objects from disk fails"); 
 		}
         return null;
 	}

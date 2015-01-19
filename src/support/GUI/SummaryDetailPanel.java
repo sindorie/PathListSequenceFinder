@@ -77,9 +77,8 @@ public class SummaryDetailPanel extends JPanel {
 		this.constraintList.setModel(constraintModel);
 		
 		DefaultListModel<Expression> symbolicModel = new DefaultListModel<Expression>();
-		for(Entry<Expression, Expression> entry : summary.symbolic.entrySet()){
-			constraintModel.addElement(entry.getKey());
-			constraintModel.addElement(entry.getValue());
+		for(Expression expre : summary.symbolic){
+			constraintModel.addElement(expre);
 		}
 		this.symbolicList.setModel(symbolicModel);
 		
